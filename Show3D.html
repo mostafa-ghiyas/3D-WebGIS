@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="Scripts/jquery-2.0.3.js"></script>
+    <script src="http://www.google.com/jsapi?key=ABQIAAAAuPsJpk3MBtDpJ4G8cqBnjRRaGTYH6UMl8mADNa0YKuWNNa8VNxQCzVBXTx2DYyXGsTOxpWhvIG7Djw"
+        type="text/javascript"></script>
+    <script type="text/javascript">
+
+        var ge;
+
+        google.load("earth", "1");
+
+        function init() {
+            google.earth.createInstance('map3d', initCallback, failureCallback);
+        }
+
+        function initCallback(instance) {
+            ge = instance;
+            ge.getWindow().setVisibility(true);
+
+            // add a navigation control
+            ge.getNavigationControl().setVisibility(ge.VISIBILITY_AUTO);
+
+            // add some layers
+            ge.getLayerRoot().enableLayerById(ge.LAYER_BORDERS, true);
+            ge.getLayerRoot().enableLayerById(ge.LAYER_ROADS, true);
+
+
+            document.getElementById('installed-plugin-version').innerHTML =
+               ge.getPluginVersion().toString();
+        }
+
+        function failureCallback(errorCode) {
+        }
+
+        //});
+    </script>
+    <script>
+
+        //Sample
+        //http://earth-api-samples.googlecode.com/svn/trunk/examples/kml-fetch-interactive.html
+
+        function lookAt(lat, lng, alt, range) {
+            var la = ge.createLookAt('');
+            la.set(lat, lng, alt, ge.ALTITUDE_RELATIVE_TO_GROUND, 0, 0, range);
+            ge.getView().setAbstractView(la);
+
+            //1-
+            //فایل کی ام زد را در پوشه با نام کی ام زد در محل لوکال هاست کپی میکنیم
+            var kmlUrl = 'http://localhost/KMZ/bahman1.kmz';
+            
+            //2-
+            //اضافه کردن مایم تایپ های لازم
+            //By default, Microsoft IIS only supports a small number of files. This is what you need to support KML and KMZ files in IIS.
+
+            //The MIME type details are:
+
+            //Extension: .kml
+            //MIME type: application/vnd.google-earth.kml+xml
+
+            //Extension: .kmz
+            //MIME type: application/vnd.google-earth.kmz
+
+
+
+            google.earth.fetchKml(ge, kmlUrl, finished);
+            function finished(object) {
+                if (!object) {
+                    // wrap alerts in API callbacks and event handlers
+                    // in a setTimeout to prevent deadlock in some browsers
+                    setTimeout(function () {
+                        alert('Bad or null KML.');
+                    }, 0);
+                    return;
+
+                }
+                ge.getFeatures().appendChild(object);
+            }
+        }
+
+    </script>
+    <style>
+        body
+        {
+            background-color: #40464b;
+        }
+    </style>
+</head>
+<body onload="init()" style="font-family: arial, sans-serif; font-size: 13px; border: 0;">
+    <br />
+    <div id="map3d" style="width: 1470px; height: 750px; margin: auto">
+    </div>
+    <br />
+    <!--<input type="button" id="myfunction" onclick ="myfunction()" value="Click Me! " />-->
+    <input type='button' style="margin-left: 603px; font-family: Tahoma; height: 30px;"
+        value='نمایش سه بعدی' onclick='lookAt(35.646368, 51.397987, 100, 4000)' />
+    <!-- <div>Installed Plugin Version: <!--<span id="installed-plugin-version" style="font-weight: bold;">Loading...</span>-->
+    </div>
+</body>
+</html>
